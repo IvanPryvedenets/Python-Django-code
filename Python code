@@ -11,7 +11,7 @@ class ProductInformation(View):                                                 
 
     def post(self, request, slug):                                                                          # Оголошую метод який приймає інформацію від користувача
         post = get_object_or_404(Product, slug=slug)                                                        # Якщо об'єкт не буде знайдений в базі, виведи http404
-        product = Product.objects.get(slug__iexact=slug)
+        product = Product.objects.get(slug__iexact=slug)                                                    # Отримуємо конкретний екземпляр класу на кожній ітерації
         products = Product.objects.all()                                                                    # Отримую всі екземпляри класу продукт
         for instans in products:
             if instans.slug == slug:                                                                        # Якщо слаг дорівнює виконуваному слагу
@@ -20,7 +20,7 @@ class ProductInformation(View):                                                 
             form = CommentForm(request.POST)                                                                # Заповни форму інформацією яка прийшла в словник POST
             if form.is_valid():                                                                             # Якщо дані валідні
                 post = form.save(commit=False)                                                              # Притримуємо збереження для того щоб додати деякі дані з моделі
-                post.product_id = id
+                post.product_id = id                                                                        # Вказуємо id екземпляру класу на якому знаходиться користувач
                 post.date_pub = timezone.now()                                                              # Виводимо час
                 post.save()                                                                                 # Зберігаємо форму
                 form = CommentForm()                                                                        # Виведи порожню форму
