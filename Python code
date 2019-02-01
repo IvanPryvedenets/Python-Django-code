@@ -1,0 +1,30 @@
+# Python-Django-code
+
+
+# Об'єкт який має в собі 2 методи: get - який виводить інформацію від сервера та post - який приймає інформацію від користувача
+
+class ProductInformation(View):                                                                             # Заповнюю сторінку інформацією про продукт та формою
+    def get(self, request, slug):                                                                           # Оголошую метод get який повертає мені інформацію
+        form = CommentForm()                                                                                # Дістаю поля форми
+        product = Product.objects.get(slug__iexact=slug)                                                    # отримую створений об'єкт з унікальним слагом
+        return render(request, 'App/Product_information.html', context={'product': product, 'form': form})  # Заповнюю шаблон контентом
+
+    def post(self, request, slug):                                                                          # Оголошую метод який приймає інформацію від користувача
+        post = get_object_or_404(Product, slug=slug)                                                        # Якщо об'єкт не буде знайдений в базі, виведи http404
+        product = Product.objects.get(slug__iexact=slug)
+        products = Product.objects.all()                                                                    # Отримую всі екземпляри класу продукт
+        for instans in products:
+            if instans.slug == slug:                                                                        # Якщо слаг дорівнює виконуваному слагу
+                id = instans.id                                                                             # Бери id екземпляру та поміти її в перемінну
+        if request.method == 'POST':                                                                        # Якщо на сервер приходить інформація
+            form = CommentForm(request.POST)                                                                # Заповни форму інформацією яка прийшла в словник POST
+            if form.is_valid():                                                                             # Якщо дані валідні
+                post = form.save(commit=False)                                                              # Притримуємо збереження для того щоб додати деякі дані з моделі
+                post.product_id = id
+                post.date_pub = timezone.now()                                                              # Виводимо час
+                post.save()                                                                                 # Зберігаємо форму
+                form = CommentForm()                                                                        # Виведи порожню форму
+                return render(request, 'App/Product_information.html', {'form': form, 'product': product})                                 # Якщо все ок, переводимо користувача на цю ст
+        else:
+            form = CommentForm()                                                                            # Задаємо формі порожні поля вводу
+            return render(request, 'App/Product_information.html', context={'product': product, 'form': form})
