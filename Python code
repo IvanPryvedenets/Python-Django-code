@@ -28,3 +28,23 @@ class ProductInformation(View):                                                 
         else:
             form = CommentForm()                                                                            # Задаємо формі порожні поля вводу
             return render(request, 'App/Product_information.html', context={'product': product, 'form': form})
+
+
+
+
+# Об'єкт пошуку продуктів
+
+class SearchProduct(View):
+    def get(self, request):                                                                                                 # Оголошую метод get
+        search_query = self.request.GET.get('search', '')                                                                   # Передаємо перемінній те, що передав користувач на сервер формою
+        found_products = Product.objects.filter(Q(title__icontains=search_query) | Q(description__icontains=search_query))  # Фільтруємо об'єкти. Клас Q дає змогу організовувати пошук за двома полями об'єкту в один час
+        return render(request, 'App/Results_of_search.html', context={'found_products': found_products})                    # Виводмо відфільтровані об'єкти
+        
+        
+        
+# Вдосконалений варіант пошуку продуктів
+# Перевага над попереднім варіантом - дає змогу здійснювати пошук за декількома словами. 
+# Будуть виведені об'єкти в яких слова в їх полях співпали зі словами які були відправлені на сервер та оброблені класом пошуку
+
+
+
