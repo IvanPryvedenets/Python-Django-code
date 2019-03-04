@@ -43,8 +43,25 @@ class SearchProduct(View):
         
         
 # Вдосконалений варіант пошуку продуктів
-# Перевага над попереднім варіантом - дає змогу здійснювати пошук за декількома словами. 
+# Перевага над попереднім варіантом: дає змогу здійснювати пошук за декількома словами; переводить користувача на шаблон "нічого не знайдено". 
 # Будуть виведені об'єкти в яких слова в їх полях співпали зі словами які були відправлені на сервер та оброблені класом пошуку
+class MarshmallowList(View):                                                                                                    # Об'єкт в якому містяться деякі продукти
+    def get(self, request):                                                                                                     # Метод get який містить в собі умовний оператор
+        search_query = self.request.GET.get('search')                                                                           # Передаємо перемінній те, що передав користувач на сервер формою
+
+        if search_query:                                                                                                        # Якщо перемінна заповнена даними
+            products = Product.objects.annotate(look_for=SearchVector('title')                                                  # Аннотація дає змогу пов'язувати поля
+                                                        + SearchVector('brand')                                                 # SearchVector дає з могу звернутись до декількох полів одночасно зв'язуючи їх разом
+                                                        + SearchVector('description')
+                                                        + SearchVector('category__category'),).filter(look_for=search_query)    # Фільтр фільтрує пов'язані поля за її аргументом
+            if products:                                                                                                        # Якщо перемінна product заповнена 
+                return render(request, 'App/Results_of_search.html', context={'products': products, 'search_query': search_query})  # Поверни користувача на сторінку з результатом
+            else:                                                                                                                # Якщо ні
+                return render(request, 'App/Not_found_search.html')                                                              # Поверни на сторінку з відсутніми результатами
+        else:                                                                                                                    # Якщо ж перемінна search_query порожня
+            products = Product.objects.all()                                                                                     # Помісти в перемінну всі об'єкти
+            return render(request, 'App/Marshmallow_list.html', context={'products': products})                                  # Та виведи їх тут
+
 
 
 
