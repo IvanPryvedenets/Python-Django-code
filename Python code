@@ -32,6 +32,41 @@ class ProductInformation(View):                                                 
 
 
 
+
+
+# Вдосконалений варіант форми коментаря
+# Перевага - беремо очищені дані з форми
+class ProductInformation(View):                                                                             # Заповнюю сторінку інформацією про продукт та формою
+    def get(self, request, slug):                                                                           # Заповнює шаблон інформацією
+        form = CommentForm()                                                                                # Дістаю поля форми
+        product = Product.objects.get(slug__iexact=slug)                                                    # Отримую унікальний слаг об'єкту до якого ми звенулись
+        return render(request, 'App/Product_information.html', context={'product': product, 'form': form})  # Заповнюю шаблон контентом
+
+    def post(self, request, slug):                                                                          # Оголошую метод який приймає інформацію від користувача
+        post = get_object_or_404(Product, slug=slug)                                                        # Якщо об'єкт не буде знайдений в базі, виведи http404
+        product = Product.objects.get(slug__iexact=slug)                                                    # Отримую унікальний слаг об'єкту до якого ми звенулись
+        products = Product.objects.all()                                                                    # Отримую всі екземпляри класу продукт
+        for instance in products:                                                                           # Для кожного екземпляру класу
+            if instance.slug == slug:                                                                       # Якщо слаг дорівнює виконуваному слагу
+                id = instance.id                                                                            # Бери id об'єкта
+        form = CommentForm(request.POST)                                                                    # Передаю перемінній отриману інформацію
+        if request.method == 'POST' and form.is_valid():                                                    # Якщо на сервер приходить валідна інформація                                                                                                     # Якщо дані валідні
+            comment = form.save(commit=False)                                                               # Притримуємо збереження для того щоб додати деякі дані з моделі
+            comment.product_id = id                                                                         # Отримую id продукту до якого буде прив'язаний об'єкт коментаря
+            comment.name = form.cleaned_data['name']                                                        # Передаю об'єкту коментаря очищені дані з полів форми
+            comment.email = form.cleaned_data['email']
+            comment.text = form.cleaned_data['text']
+            comment.date_pub = timezone.now()                                                               # Передаю аткуальну дату
+            comment.save()                                                                                  # Зберігаємо форму                                                     # Передаю перемінній порожню форму
+            return render(request, 'App/Product_information.html', {'product': product, 'form': form})      # Якщо все ок, переводимо користувача на цю ст
+        else:
+            form = CommentForm()                                                                            # Задаємо формі порожні поля вводу
+            return render(request, 'App/Product_information.html', context={'product': product, 'form': form})
+
+
+
+
+
 # Об'єкт пошуку продуктів
 
 class SearchProduct(View):
