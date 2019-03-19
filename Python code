@@ -57,11 +57,13 @@ class ProductInformation(View):                                                 
             comment.email = form.cleaned_data['email']
             comment.text = form.cleaned_data['text']
             comment.date_pub = timezone.now()                                                               # Передаю аткуальну дату
-            comment.save()                                                                                  # Зберігаємо форму                                                     # Передаю перемінній порожню форму
-            return render(request, 'App/Product_information.html', {'product': product, 'form': form})      # Якщо все ок, переводимо користувача на цю ст
+            comment.save()                                                                                  # Зберігаємо форму
+            form = CommentForm()                                                                            # Передаю перемінній порожню форму
+            return render(request, 'App/Product_information.html', {'product': product, 'form': form})      # Якщо все ок, переводимо користувача на цю ст та виводимо порожню форму
         else:
             form = CommentForm()                                                                            # Задаємо формі порожні поля вводу
             return render(request, 'App/Product_information.html', context={'product': product, 'form': form})
+
 
 
 
